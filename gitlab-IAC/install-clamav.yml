@@ -2,6 +2,7 @@
 - name: Déployer et configurer ClamAV
   hosts: agents  # Cible la VM3 (groupe agents dans votre inventory)
   become: yes
+  gather_facts: false
   tasks:
     - name: Installer les paquets ClamAV
       ansible.builtin.apt:
