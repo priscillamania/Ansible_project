@@ -1,0 +1,9 @@
+---
+- name: Scénario C - Scan de ports
+  hosts: agents
+  become: yes
+  tasks:
+    - name: Exécuter nmap sur la VM3
+      ansible.builtin.shell: nmap -sS -p 1-1000 {{ inventory_hostname }}
+      changed_when: false
+      ignore_errors: yes

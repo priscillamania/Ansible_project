@@ -1,0 +1,13 @@
+---
+- name: Scenario A - Brute Force SSH
+  hosts: attackers
+  gather_facts: false
+  tasks:
+    - name: Executer 15 essayes de login SSH
+      shell: |
+        for i in $(seq 1 15); do
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 -o BatchMode=yes -o PasswordAuthentication=no invalid_user@vm3.soc-lab.local 2>/dev/null
+        done
+      ignore_errors: yes
+      changed_when: false
+

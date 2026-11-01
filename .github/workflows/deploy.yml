@@ -1,0 +1,33 @@
+name: Deploy ClamAV with Ansible
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VM IPs to known_hosts
+        run: |
+          ssh-keyscan -H 192.168.1.54 192.168.1.26 >> ~/.ssh/known_hosts
+
+      - name: Run Ansible Playbook (ClamAV)
+        run: |
+          cd gitlab-IAC
+          ansible-playbook -i inventory.ini install-clamav.yml

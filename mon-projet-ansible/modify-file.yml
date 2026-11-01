@@ -1,0 +1,11 @@
+---
+- name: Scénario B - Modification de /etc/passwd
+  hosts: agents
+  become: yes
+  tasks:
+    - name: Ajouter une ligne au fichier /etc/passwd
+      ansible.builtin.lineinfile:
+        path: /etc/passwd
+        line: "test:x:1001:1001::/home/test:/bin/bash"
+        insertafter: EOF
+      changed_when: true

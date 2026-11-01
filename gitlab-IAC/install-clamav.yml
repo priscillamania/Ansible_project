@@ -1,0 +1,47 @@
+---
+- name: Déployer et configurer ClamAV
+  hosts: agents  # Cible la VM3 (groupe agents dans votre inventory)
+  become: yes
+  tasks:
+    - name: Installer les paquets ClamAV
+      ansible.builtin.apt:
+        name:
+          - clamav
+          - clamav-daemon
+          - clamav-freshclam
+        state: present
+        update_cache: yes
+        lock_timeout: 300
+
+    - name: Mettre à jour les signatures antivirales (freshclam)
+      ansible.builtin.command: freshclam
+      register: freshclam_result
+      changed_when: "'updated' in freshclam_result.stdout"
+      failed_when: false
+
+    - name: Activer la remontée des logs ClamAV vers Syslog
+      ansible.builtin.lineinfile:
+        path: /etc/clamav/clamd.conf
+        regexp: '^#LogSyslog'
+        line: 'LogSyslog true'
+      notify: Redémarrer ClamAV
+
+    - name: S'assurer que le service ClamAV est démarré
+      ansible.builtin.service:
+        name: clamav-daemon
+        state: started
+        enabled: yes
+
+    - name: Planifier l'analyse quotidienne à 3h du matin
+      ansible.builtin.cron:
+        name: "Analyse ClamAV quotidienne"
+        minute: "0"
+        hour: "3"
+        job: "/usr/bin/clamdscan -i --log=/var/log/clamav/daily.log /var/www /home | logger -t 'clamd[5286]'"
+        user: root
+
+  handlers:
+    - name: Redémarrer ClamAV
+      ansible.builtin.service:
+        name: clamav-daemon
+        state: restarted
