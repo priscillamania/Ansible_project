@@ -1,0 +1,23 @@
+# SOC Lab - Wazuh, Grafana et Automatisation GitOps
+
+Ce dépôt contient l'ensemble de l'infrastructure et des configurations pour le déploiement d'un Centre Opérationnel de Sécurité (SOC) basé sur Wazuh. Le projet met l'accent sur l'**Infrastructure as Code (IaC)** en utilisant **Ansible** et **GitHub Actions** pour automatiser le déploiement des services, la configuration des agents et la remontée des logs.
+
+## Architecture du Laboratoire
+
+L'infrastructure est composée de trois machines virtuelles (Ubuntu Server 22.04) sur un réseau isolé (192.168.1.0/24).
+
+| VM | Rôle | Services Déployés |
+| :--- | :--- | :--- |
+| **VM1** (192.168.1.54) | Serveur Wazuh & Visualisation | Wazuh Indexer, Wazuh Manager, Wazuh Dashboard, Filebeat, Grafana, Prometheus, Node Exporter, Nginx + PHP (Page de vulnérabilités) |
+| **VM2** (192.168.1.20) | Machine de Contrôle / Attaquant | Ansible, Hydra, Nmap |
+| **VM3** (192.168.1.26) | Agent / Cible | Wazuh Agent, ClamAV, Nginx, Filebeat, rsyslog, auditd |
+
+## Structure du Dépôt
+
+```text
+.
+├── .github/workflows/      # Pipelines CI/CD (GitHub Actions)
+├── gitlab-IAC/             # Playbooks Ansible pour le déploiement (ClamAV, etc.)
+├── scenario-Wazuh/         # Playbooks Ansible pour les scénarios d'attaque et tests
+├── rapport/                # Rapport technique du projet
+└── README.md
